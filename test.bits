@@ -1,0 +1,36 @@
+mask Block32 {
+    L : 16;
+    R : 16;
+};
+
+function sbox {
+    l = sbox & 0x87;
+    l = l :: 010;    
+    x = l[3:] ^ 0x61;
+    return x;
+}
+
+function feistel_round {
+    L = feistel_round[Block32.L];   
+    R = feistel_round[Block32.R];   
+
+    expanded = R[:8] :: R[8:16] :: R[:8];
+    mixed = expanded ^ 0x3D;  
+
+    out = mixed[:4] :: mixed[4:8] :: mixed[8:12] :: mixed[12:16]; 
+
+    newL = R;
+    newR = L ^ out[:16];   
+    newR = newR :: newL;
+    return newR;
+}
+
+function main : 32 {        
+    block = 0x12345678;    
+    key   = 0x0F0F0F;      
+
+    r1 = feistel_round(block);
+    r2 = feistel_round(r1);
+
+    return r2;
+}
