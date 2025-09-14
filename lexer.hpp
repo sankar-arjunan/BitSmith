@@ -13,8 +13,6 @@ enum class TokenType {
     OPEN_SQR, CLOSE_SQR,
     EQ,
     PIPE, AMP, XOR, TILDE,
-    EQ_2, NOT_EQ,
-    AND, OR,
     SL, SR, CSL, CSR, CONCAT,
     END_OF_FILE
 };

@@ -13,30 +13,26 @@ std::string Preprocessor::process(const std::string &source) {
     while (i < n) {
         char c = source[i];
 
-        // Handle line comments //
         if (c == '/' && i+1 < n && source[i+1] == '/') {
             i += 2;
             while (i < n && source[i] != '\n') ++i;
             if (i < n && source[i] == '\n') {
-                output.push_back('\n'); // preserve line break
+                output.push_back('\n');
                 ++i;
             }
             continue;
         }
 
-        // Handle mask blocks
         if (n-i >= 4 && source.compare(i,4,"mask")==0 && (i+4==n || !std::isalnum(source[i+4]))) {
             size_t maskStart = i;
             size_t maskLineStart = output.size();
 
-            // parse mask name
             i +=4; while (i<n && std::isspace(source[i])) ++i;
             size_t nameStart = i;
             while (i<n && (std::isalnum(source[i]) || source[i]=='_')) ++i;
             std::string maskName = source.substr(nameStart,i-nameStart);
             while (i<n && source[i]!='{') ++i; if (i<n && source[i]=='{') ++i;
 
-            // process mask body
             while (i<n) {
                 while (i<n && std::isspace(source[i])) {
                     if (source[i] == '\n') output.push_back('\n'); // keep newlines
@@ -91,37 +87,40 @@ std::string Preprocessor::process(const std::string &source) {
                 if(i<n && source[i]==';') ++i;
             }
 
-            // consume final ';' or '}' keeping newlines
             if (i<n && (source[i]==';' || source[i]=='\n')) {
                 if (source[i]=='\n') output.push_back('\n');
                 ++i;
             }
+            runningSum = 0;
 
             continue;
         }
 
-        // Default: copy character
         output.push_back(source[i++]);
     }
 
-    // Replace mask usages
-    for(auto &kv : masks) {
-        std::string key = kv.first;
-        std::string val = kv.second;
-        size_t pos = 0;
-        while((pos = output.find(key,pos)) != std::string::npos) {
-            bool okBefore = (pos==0) || !(std::isalnum(output[pos-1]) || output[pos-1]=='_');
-            size_t afterPos = pos + key.size();
-            bool okAfter = (afterPos>=output.size()) || !(std::isalnum(output[afterPos]) || output[afterPos]=='_');
-            if(okBefore && okAfter) { 
-                output.replace(pos,key.size(),val); 
-                pos += val.size(); 
-            }
-            else pos+=key.size();
-        }
-    }
+	bool changed = true;
+	while (changed) {
+	    changed = false;
+	    for (auto &kv : masks) {
+	        const std::string &key = kv.first;
+	        const std::string &val = kv.second;
+	        size_t pos = 0;
+	        while ((pos = output.find(key, pos)) != std::string::npos) {
+	            bool okBefore = (pos == 0) || !(std::isalnum(output[pos - 1]) || output[pos - 1] == '_');
+	            size_t afterPos = pos + key.size();
+	            bool okAfter = (afterPos >= output.size()) || !(std::isalnum(output[afterPos]) || output[afterPos] == '_');
+	            if (okBefore && okAfter) {
+	                output.replace(pos, key.size(), val);
+	                pos += val.size();
+	                changed = true;
+	            } else {
+	                pos += key.size();
+	            }
+	        }
+	    }
+	}
 
-    // Validate all dotted references
     size_t dotPos=0;
     while((dotPos = output.find('.',dotPos)) != std::string::npos) {
         size_t start = dotPos;

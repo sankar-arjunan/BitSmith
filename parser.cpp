@@ -135,7 +135,7 @@ ExprPtr Parser::parseRHS(){
         }
 
         std::string op = tokens[pos++].value;
-        if(!isBinaryOp(op)) throw std::runtime_error("Invalid bianry operator : "+op);
+        if(!isBinaryOp(op)) throw std::runtime_error("Invalid binary operator : "+op);
         auto rop = parsePrimitive();
 
         return std::make_unique<BinaryExpr>(op, std::move(lop), std::move(rop));

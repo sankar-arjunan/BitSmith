@@ -131,10 +131,6 @@ const std::unordered_map<std::string, TokenType> Lexer::keywords = {
 };
 
 const std::unordered_map<std::string, TokenType> Lexer::twoCharOps = {
-    {"==", TokenType::EQ_2},
-    {"!=", TokenType::NOT_EQ},
-    {"&&", TokenType::AND},
-    {"||", TokenType::OR},
     {"<<", TokenType::SL},
     {">>", TokenType::SR},
     {"<<<", TokenType::CSL},

@@ -1,0 +1,31 @@
+// Example Code
+
+mask Block32 {
+    L : 16;
+    R : 16;
+};
+
+
+function round {
+    blk = round;
+    key = 0x3F3F;
+
+    L = blk[Block32.L];
+    R = blk[Block32.R];
+
+    f = R ^ key;
+
+    newL = R;
+    newR = L ^ f;
+
+    result = newL :: newR;
+    return result;
+}
+
+function main : 32 {
+    plaintext = main;        
+    s1 = round(plaintext);   
+    s2 = round(s1);
+    s3 = s2 & 0xFFFFFF00;  
+    return s3;               
+}

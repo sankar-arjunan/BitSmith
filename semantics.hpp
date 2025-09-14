@@ -14,9 +14,10 @@ struct Bit {
 
 class SemanticAnalyzer {
 public:
-    void analyze(Program* root);
+    std::vector<int> analyze(Program* root);
     std::vector<int> processPrimitive(Expr* expr);
     std::vector<int> processFunction(FuncDecl& function, std::vector<int>& inputIndices);
+    std::string cGen(const std::string& name, std::vector<int> out);
 };
 
 extern std::unordered_map<std::string, std::vector<int>> varMapping;
