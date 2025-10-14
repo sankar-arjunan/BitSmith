@@ -23,35 +23,34 @@ It allows developers to perform **masking, slicing, concatenation, and binary op
 
 ### Example Code
 
-    mask Block32 {
-        L: 16;
-        R: 16;
-    };
+```
+mask Block32 {
+    L: 16;
+    R: 16;
+};
 
-    function feistel_round {
-        L = feistel_round[Block32.L];   
-        R = feistel_round[Block32.R];   
-        
-        expanded = R[:8] :: R[8:16] :: R[:8];
-        mixed = expanded ^ 0x3D;  
-    
-        out = mixed[:4] :: mixed[4:8] :: mixed[8:12] :: mixed[12:16]; 
-    
-        newL = R;
-        newR = L ^ out[:16];   
-        newR = newR :: newL;
-        return newR;
-    }
-    
-    function main : 32 {        
-        block = 0x12345678;    
-        key   = 0x0F0F0F;      
-    
-        r1 = feistel_round(block);
-        r2 = feistel_round(r1);
-    
-        return r2;
-    }
+function F {
+    return (F ^ 0x3D5A) + 0x1234;
+}
+
+function feistel_round {
+    L = feistel_round[:16];
+    R = feistel_round[16:32];
+
+    newL = R;
+    newR = L ^ F(R);
+
+    return newL :: newR;
+}
+
+function main : 32 {
+    block = 0x12345678;
+    r1 = feistel_round(block);
+    r2 = feistel_round(r1);
+
+    return r2;
+}
+```
 
 ### Requirements
 - C++17 or later  
